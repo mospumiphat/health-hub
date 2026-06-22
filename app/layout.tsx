@@ -18,12 +18,23 @@ const spaceMono = Space_Mono({
 export const metadata: Metadata = {
   title: "Training Journal",
   description: "Personal training record book",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: "Journal",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    icon: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: "#1A0F08",
 };
 
 export default function RootLayout({

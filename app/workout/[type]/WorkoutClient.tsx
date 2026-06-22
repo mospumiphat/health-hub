@@ -107,17 +107,17 @@ export default function WorkoutClient({ type }: Props) {
     <main className="min-h-screen bg-paper flex flex-col pb-32">
 
       {/* Header */}
-      <div className={`px-6 pt-12 pb-5 border-b-2 border-ink relative`}>
+      <div className="px-6 pt-12 pb-5 border-b-2 border-ink relative">
         <div className={`absolute left-0 top-0 bottom-0 w-[4px] ${accent.bg}`} />
         <button
           onClick={() => router.back()}
-          className="font-mono text-[10px] text-ink-3 uppercase tracking-[0.2em] mb-4 block active:text-ink"
+          className="font-mono text-xs text-ink-3 uppercase tracking-widest mb-4 block active:text-ink"
         >
           ← Back to Journal
         </button>
-        <p className="font-mono text-[10px] text-ink-3 uppercase tracking-[0.25em] mb-1">{today}</p>
+        <p className="font-mono text-xs text-ink-3 uppercase tracking-widest mb-1">{today}</p>
         <h1 className="font-display text-3xl font-bold text-ink leading-tight">{meta.title}</h1>
-        <p className="font-mono text-[10px] text-ink-3 tracking-widest mt-1">{meta.subtitle}</p>
+        <p className="font-mono text-xs text-ink-3 mt-1">{meta.subtitle}</p>
       </div>
 
       {/* Carry over button */}
@@ -125,7 +125,7 @@ export default function WorkoutClient({ type }: Props) {
         <div className="px-6 pt-5 pb-2">
           <button
             onClick={fillEntireWorkout}
-            className="w-full border border-rule text-ink-2 font-mono text-[10px] font-bold tracking-[0.2em] uppercase py-3.5 active:bg-surface transition-colors"
+            className="w-full border border-rule text-ink-2 font-mono text-xs font-bold tracking-widest uppercase py-3.5 active:bg-surface transition-colors"
           >
             ↩ Carry Over From Last Session
           </button>
@@ -133,22 +133,22 @@ export default function WorkoutClient({ type }: Props) {
       )}
 
       {/* Exercise entries */}
-      <div className="px-6 pt-4 flex flex-col">
+      <div className="px-6 pt-2 flex flex-col">
         {data.map((ex, i) => {
           const prev = previous[ex.name];
           return (
             <div key={ex.name} className="border-b border-rule py-5">
 
-              {/* Exercise label row */}
-              <div className="flex items-start justify-between mb-1">
+              {/* Exercise label */}
+              <div className="flex items-start justify-between mb-2">
                 <div className="flex items-baseline gap-3">
-                  <span className={`font-mono text-xs font-bold ${accent.text}`}>{ROMAN[i]}</span>
-                  <h2 className="font-mono text-xs font-bold tracking-[0.12em] text-ink uppercase">{ex.name}</h2>
+                  <span className={`font-mono text-sm font-bold ${accent.text}`}>{ROMAN[i]}</span>
+                  <h2 className="font-mono text-sm font-bold tracking-wider text-ink uppercase">{ex.name}</h2>
                 </div>
                 {prev && (
                   <button
                     onClick={() => usePrevious(i)}
-                    className={`font-mono text-[9px] font-bold tracking-[0.15em] uppercase ${accent.text} active:opacity-60 shrink-0 ml-2`}
+                    className={`font-mono text-xs font-bold tracking-wider uppercase ${accent.text} active:opacity-60 shrink-0 ml-3`}
                   >
                     ↩ Carry Over
                   </button>
@@ -157,16 +157,16 @@ export default function WorkoutClient({ type }: Props) {
 
               {/* Previous entry */}
               {prev ? (
-                <p className="font-mono text-[10px] text-ink-3 mb-4 ml-6">
+                <p className="font-mono text-xs text-ink-3 mb-4 ml-7">
                   prev — {prev.weight}kg · {prev.reps} reps · {prev.sets} sets
                 </p>
               ) : (
-                <p className="font-mono text-[10px] text-ink-3 mb-4 ml-6">no previous entry</p>
+                <p className="font-mono text-xs text-ink-3 mb-4 ml-7">no previous entry</p>
               )}
 
-              {/* Weight — full width */}
+              {/* Weight */}
               <div className="mb-3">
-                <label className="font-mono text-[9px] text-ink-3 uppercase tracking-[0.2em] mb-2 block">
+                <label className="font-mono text-xs text-ink-3 uppercase tracking-widest mb-2 block">
                   Load (kg)
                 </label>
                 <div className="flex items-center gap-2">
@@ -182,7 +182,7 @@ export default function WorkoutClient({ type }: Props) {
                     placeholder="—"
                     value={ex.weight}
                     onChange={(e) => update(i, "weight", e.target.value)}
-                    className="flex-1 bg-surface border border-rule text-ink font-mono text-lg font-bold text-center h-12 focus:outline-none focus:border-ink-2"
+                    className="flex-1 bg-surface border border-rule text-ink font-mono text-xl font-bold text-center h-12 focus:outline-none focus:border-ink-2"
                   />
                   <button
                     onClick={() => step(i, "weight", 2.5)}
@@ -197,7 +197,7 @@ export default function WorkoutClient({ type }: Props) {
               <div className="grid grid-cols-2 gap-3">
                 {(["reps", "sets"] as const).map((field) => (
                   <div key={field}>
-                    <label className="font-mono text-[9px] text-ink-3 uppercase tracking-[0.2em] mb-2 block">
+                    <label className="font-mono text-xs text-ink-3 uppercase tracking-widest mb-2 block">
                       {field}
                     </label>
                     <div className="flex items-center gap-1.5">
@@ -230,15 +230,13 @@ export default function WorkoutClient({ type }: Props) {
         })}
       </div>
 
-      {/* Log session button */}
+      {/* Log session */}
       <div className="fixed bottom-0 left-0 right-0 px-6 pb-8 pt-4 bg-paper border-t-2 border-ink">
         <button
           onClick={handleSave}
           disabled={saved}
-          className={`w-full font-mono text-xs font-bold tracking-[0.3em] uppercase py-4 transition-colors ${
-            saved
-              ? `${accent.bg} text-paper`
-              : "bg-ink text-paper active:bg-ink-2"
+          className={`w-full font-mono text-sm font-bold tracking-widest uppercase py-4 transition-colors ${
+            saved ? `${accent.bg} text-paper` : "bg-ink text-paper active:bg-ink-2"
           }`}
         >
           {saved ? "✓  Session Logged" : "Log Session"}

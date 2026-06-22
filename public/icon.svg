@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1A0F08"/>
+  <rect x="24" y="24" width="464" height="464" fill="none" stroke="#C8B99A" stroke-width="6"/>
+  <rect x="36" y="36" width="440" height="440" fill="none" stroke="#C8B99A" stroke-width="1.5"/>
+  <text x="256" y="190" font-family="Georgia,'Times New Roman',serif" font-size="52" font-style="italic"
+    text-anchor="middle" fill="#C8B99A" letter-spacing="6">Training</text>
+  <line x1="80" y1="215" x2="432" y2="215" stroke="#C8B99A" stroke-width="1.5"/>
+  <text x="256" y="380" font-family="Georgia,'Times New Roman',serif" font-size="210"
+    font-weight="bold" text-anchor="middle" fill="#F2EBD9">J</text>
+  <text x="256" y="450" font-family="Georgia,'Times New Roman',serif" font-size="34"
+    text-anchor="middle" fill="#C8B99A" letter-spacing="14">OURNAL</text>
+</svg>

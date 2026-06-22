@@ -40,10 +40,10 @@ function SessionCard({ session }: { session: WorkoutSession }) {
         className="w-full py-4 flex items-start justify-between active:bg-surface transition-colors text-left"
       >
         <div className="flex items-baseline gap-3">
-          <span className={`font-mono text-xs font-bold shrink-0 ${accent.text}`}>{meta.numeral}</span>
+          <span className={`font-mono text-sm font-bold shrink-0 ${accent.text}`}>{meta.numeral}</span>
           <div>
-            <p className="font-mono text-[10px] font-bold tracking-[0.15em] text-ink uppercase">{meta.title}</p>
-            <p className="font-mono text-[10px] text-ink-3 mt-0.5">
+            <p className="font-mono text-sm font-bold tracking-wider text-ink uppercase">{meta.title}</p>
+            <p className="font-mono text-xs text-ink-3 mt-0.5">
               {formatDate(session.date)}
               {formatDate(session.date) !== "Today" && formatDate(session.date) !== "Yesterday"
                 ? ` · ${formatTime(session.date)}`
@@ -52,19 +52,19 @@ function SessionCard({ session }: { session: WorkoutSession }) {
             </p>
           </div>
         </div>
-        <span className="font-mono text-[10px] text-ink-3 mt-0.5 ml-3 shrink-0">
+        <span className="font-mono text-xs text-ink-3 mt-0.5 ml-3 shrink-0">
           {expanded ? "▲" : "▼"}
         </span>
       </button>
 
       {expanded && (
-        <div className="pb-4 pl-6 flex flex-col gap-2">
+        <div className="pb-4 pl-6 flex flex-col gap-2.5">
           {session.exercises.map((ex) => {
             const hasData = ex.weight || ex.reps || ex.sets;
             return (
               <div key={ex.name} className="flex items-baseline justify-between">
-                <span className="font-mono text-[10px] text-ink-2 uppercase tracking-wider">{ex.name}</span>
-                <span className="font-mono text-[10px] text-ink-3 ml-4 shrink-0">
+                <span className="font-mono text-xs text-ink-2 uppercase tracking-wider">{ex.name}</span>
+                <span className="font-mono text-xs text-ink-3 ml-4 shrink-0">
                   {hasData
                     ? [ex.weight && `${ex.weight}kg`, ex.sets && ex.reps && `${ex.sets}×${ex.reps}`]
                         .filter(Boolean).join("  ") || "—"
@@ -104,13 +104,13 @@ export default function HistoryClient() {
       {/* Header */}
       <div className="px-6 pt-12 pb-5 border-b-2 border-ink flex items-baseline justify-between">
         <div>
-          <Link href="/" className="font-mono text-[10px] text-ink-3 uppercase tracking-[0.2em] active:text-ink block mb-3">
+          <Link href="/" className="font-mono text-xs text-ink-3 uppercase tracking-widest active:text-ink block mb-3">
             ← Back to Journal
           </Link>
           <h1 className="font-display text-3xl font-bold text-ink">Record Book</h1>
         </div>
         {sessions.length > 0 && (
-          <span className="font-mono text-[10px] text-ink-3 uppercase tracking-wider shrink-0 ml-4">
+          <span className="font-mono text-xs text-ink-3 uppercase tracking-wider shrink-0 ml-4">
             {sessions.length} sessions
           </span>
         )}
@@ -119,14 +119,14 @@ export default function HistoryClient() {
       {sessions.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-3 mt-24 px-8 text-center">
           <p className="font-display text-2xl italic text-ink-3">No entries yet.</p>
-          <p className="font-mono text-[10px] text-ink-3 uppercase tracking-[0.2em]">Log your first session to begin.</p>
+          <p className="font-mono text-xs text-ink-3 uppercase tracking-widest">Log your first session to begin.</p>
         </div>
       ) : (
         <div className="px-6 flex flex-col gap-8 pt-6">
           {groups.map(({ label, items }) => (
             <div key={label}>
-              <p className="font-mono text-[9px] text-ink-3 uppercase tracking-[0.3em] mb-2 pb-2 border-b border-rule">
-                {label}
+              <p className="font-mono text-xs text-ink-3 uppercase tracking-widest mb-2 pb-2 border-b border-rule">
+                — {label}
               </p>
               <div className="flex flex-col">
                 {items.map((session) => (
