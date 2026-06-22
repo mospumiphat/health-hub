@@ -15,14 +15,14 @@ export default function ImportClient() {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [fileName, setFileName] = useState<string>("");
 
-  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
     setStatus({ kind: "idle" });
 
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       try {
         const raw = JSON.parse(ev.target?.result as string);
         const { sessions, errors } = parseImportData(raw);
@@ -30,7 +30,7 @@ export default function ImportClient() {
           setStatus({ kind: "error", message: "No valid records found.", rowErrors: errors.slice(0, 5) });
           return;
         }
-        const { added, skipped } = mergeSessions(sessions);
+        const { added, skipped } = await mergeSessions(sessions);
         setStatus({ kind: "success", added, skipped });
       } catch {
         setStatus({ kind: "error", message: "Invalid JSON file.", rowErrors: [] });
@@ -41,8 +41,6 @@ export default function ImportClient() {
 
   return (
     <main className="min-h-screen bg-paper flex flex-col pb-10">
-
-      {/* Header */}
       <div className="px-5 pt-12 pb-6">
         <Link href="/" className="text-xs font-mono text-ink-3 uppercase tracking-widest active:text-ink block mb-4">
           ← Back
@@ -53,12 +51,8 @@ export default function ImportClient() {
 
       <div className="px-5 flex flex-col gap-4">
 
-        {/* Download seed data */}
-        <a
-          href="/workout-history.json"
-          download="workout-history.json"
-          className="w-full bg-surface rounded-2xl border-l-[3px] border-sienna px-5 py-4 flex items-center gap-3 active:bg-surface-dark transition-colors"
-        >
+        <a href="/workout-history.json" download="workout-history.json"
+          className="w-full bg-surface rounded-2xl border-l-[3px] border-sienna px-5 py-4 flex items-center gap-3 active:bg-surface-dark transition-colors">
           <span className="text-xl shrink-0">💾</span>
           <div className="flex-1 min-w-0">
             <p className="font-mono text-xs font-bold text-sienna uppercase tracking-widest">Download History File</p>
@@ -67,13 +61,11 @@ export default function ImportClient() {
           <span className="text-ink-3 text-xl shrink-0">↓</span>
         </a>
 
-        {/* Upload zone */}
         <button
           onClick={() => fileRef.current?.click()}
           className={`w-full bg-surface rounded-2xl py-12 flex flex-col items-center gap-3 active:bg-surface-dark transition-colors border-2 border-dashed ${
             status.kind === "success" ? "border-forest" :
-            status.kind === "error"   ? "border-amber"  :
-                                        "border-rule"
+            status.kind === "error"   ? "border-amber"  : "border-rule"
           }`}
         >
           <span className="text-3xl">
@@ -85,7 +77,6 @@ export default function ImportClient() {
         </button>
         <input ref={fileRef} type="file" accept=".json,application/json" className="hidden" onChange={handleFile} />
 
-        {/* Success */}
         {status.kind === "success" && (
           <div className="bg-surface rounded-2xl border-l-[3px] border-forest p-5">
             <p className="font-mono text-xs font-bold text-forest uppercase tracking-widest mb-2">Import Complete</p>
@@ -101,7 +92,6 @@ export default function ImportClient() {
           </div>
         )}
 
-        {/* Error */}
         {status.kind === "error" && (
           <div className="bg-surface rounded-2xl border-l-[3px] border-amber p-5">
             <p className="font-mono text-xs font-bold text-amber uppercase tracking-widest mb-2">Import Failed</p>
@@ -116,7 +106,6 @@ export default function ImportClient() {
           </div>
         )}
 
-        {/* Format reference */}
         <div className="bg-surface rounded-2xl p-5">
           <p className="font-mono text-xs text-ink-3 uppercase tracking-widest mb-3">Expected Format</p>
           <pre className="font-mono text-xs text-ink-2 leading-relaxed overflow-x-auto bg-paper rounded-xl p-3">{`[
@@ -129,11 +118,7 @@ export default function ImportClient() {
     "workoutType": "push"
   }
 ]`}</pre>
-          <p className="font-mono text-xs text-ink-3 mt-3">
-            workoutType: <span className="text-amber">push</span> · <span className="text-forest">pull</span> · <span className="text-sienna">legs</span>
-          </p>
         </div>
-
       </div>
     </main>
   );

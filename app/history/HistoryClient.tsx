@@ -10,10 +10,8 @@ function formatDate(iso: string): string {
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
-
   if (d.toDateString() === today.toDateString()) return "Today";
   if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
-
   return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
 }
 
@@ -81,17 +79,20 @@ function groupByMonth(sessions: WorkoutSession[]): { label: string; items: Worko
 
 export default function HistoryClient() {
   const [sessions, setSessions] = useState<WorkoutSession[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setSessions(getSessions());
+    async function load() {
+      setSessions(await getSessions());
+      setLoading(false);
+    }
+    load();
   }, []);
 
   const groups = groupByMonth(sessions);
 
   return (
     <main className="min-h-screen bg-paper flex flex-col pb-10">
-
-      {/* Header */}
       <div className="px-5 pt-12 pb-6 flex items-center justify-between">
         <div>
           <Link href="/" className="text-xs font-mono text-ink-3 uppercase tracking-widest active:text-ink block mb-4">
@@ -99,14 +100,20 @@ export default function HistoryClient() {
           </Link>
           <h1 className="font-display text-3xl font-bold text-ink">Record Book</h1>
         </div>
-        {sessions.length > 0 && (
+        {!loading && sessions.length > 0 && (
           <span className="font-mono text-xs text-ink-3 uppercase tracking-wider shrink-0 ml-4 self-end pb-0.5">
             {sessions.length} sessions
           </span>
         )}
       </div>
 
-      {sessions.length === 0 ? (
+      {loading ? (
+        <div className="px-5 flex flex-col gap-2">
+          {[1,2,3,4,5].map((i) => (
+            <div key={i} className="bg-surface rounded-2xl h-16 animate-pulse" />
+          ))}
+        </div>
+      ) : sessions.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center gap-3 px-8 text-center">
           <p className="font-display text-2xl italic text-ink-3">No entries yet.</p>
           <p className="text-xs font-mono text-ink-3 uppercase tracking-widest">Log your first session to begin.</p>

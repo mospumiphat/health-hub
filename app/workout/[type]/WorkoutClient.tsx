@@ -9,7 +9,7 @@ import {
   TYPE_ACCENT_CLASS,
   WorkoutExercise,
 } from "@/lib/types";
-import { getAllLastValues, getLastValues, saveSession } from "@/lib/storage";
+import { getAllLastValues, saveSession } from "@/lib/storage";
 
 interface Props {
   type: WorkoutType;
@@ -28,14 +28,21 @@ export default function WorkoutClient({ type }: Props) {
   );
   const [previous, setPrevious] = useState<PreviousMap>({});
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const prevMap: PreviousMap = {};
-    exercises.forEach((name) => {
-      prevMap[name] = getLastValues(type, name);
-    });
-    setPrevious(prevMap);
-    setData(exercises.map((name) => ({ name, weight: "", reps: "", sets: "" })));
+    async function load() {
+      setLoading(true);
+      const allPrev = await getAllLastValues(type);
+      const prevMap: PreviousMap = {};
+      exercises.forEach((name) => {
+        prevMap[name] = allPrev[name] ?? null;
+      });
+      setPrevious(prevMap);
+      setData(exercises.map((name) => ({ name, weight: "", reps: "", sets: "" })));
+      setLoading(false);
+    }
+    load();
   }, [type]);
 
   function update(index: number, field: keyof Omit<WorkoutExercise, "name">, value: string) {
@@ -72,18 +79,17 @@ export default function WorkoutClient({ type }: Props) {
   }
 
   function fillEntireWorkout() {
-    const allPrev = getAllLastValues(type);
     setData((d) =>
       d.map((ex) => {
-        const prev = allPrev[ex.name];
+        const prev = previous[ex.name];
         if (!prev) return ex;
         return { name: ex.name, weight: prev.weight, reps: prev.reps, sets: prev.sets };
       })
     );
   }
 
-  function handleSave() {
-    saveSession({
+  async function handleSave() {
+    await saveSession({
       id: crypto.randomUUID(),
       type,
       date: new Date().toISOString(),
@@ -113,115 +119,85 @@ export default function WorkoutClient({ type }: Props) {
         <p className="text-sm text-ink-3 mt-1 ml-12">{meta.subtitle}</p>
       </div>
 
-      {/* Carry over */}
-      {hasPrevious && (
-        <div className="px-5 pb-3">
-          <button
-            onClick={fillEntireWorkout}
-            className={`w-full bg-surface rounded-2xl text-ink-2 font-mono text-xs font-bold tracking-widest uppercase py-3.5 active:bg-surface-dark transition-colors border-l-[3px] ${accent.border}`}
-          >
-            ↩ Carry Over From Last Session
-          </button>
+      {loading ? (
+        <div className="px-5 flex flex-col gap-3">
+          {exercises.map((name) => (
+            <div key={name} className="bg-surface rounded-2xl p-5 animate-pulse h-40" />
+          ))}
         </div>
-      )}
+      ) : (
+        <>
+          {hasPrevious && (
+            <div className="px-5 pb-3">
+              <button
+                onClick={fillEntireWorkout}
+                className={`w-full bg-surface rounded-2xl text-ink-2 font-mono text-xs font-bold tracking-widest uppercase py-3.5 active:bg-surface-dark transition-colors border-l-[3px] ${accent.border}`}
+              >
+                ↩ Carry Over From Last Session
+              </button>
+            </div>
+          )}
 
-      {/* Exercise cards */}
-      <div className="px-5 flex flex-col gap-3">
-        {data.map((ex, i) => {
-          const prev = previous[ex.name];
-          return (
-            <div key={ex.name} className="bg-surface rounded-2xl p-5">
-
-              {/* Exercise label */}
-              <div className="flex items-start justify-between mb-1">
-                <div>
-                  <span className={`font-mono text-xs font-bold ${accent.text} mr-2`}>{i + 1}.</span>
-                  <span className="font-mono text-sm font-bold tracking-wide text-ink uppercase">{ex.name}</span>
-                </div>
-                {prev && (
-                  <button
-                    onClick={() => usePrevious(i)}
-                    className={`font-mono text-xs font-bold tracking-wide ${accent.text} active:opacity-60 shrink-0 ml-3`}
-                  >
-                    ↩
-                  </button>
-                )}
-              </div>
-
-              {/* Previous */}
-              <p className="text-xs text-ink-3 mb-4 ml-5">
-                {prev ? `prev — ${prev.weight}kg · ${prev.reps} reps · ${prev.sets} sets` : "no previous entry"}
-              </p>
-
-              {/* Weight */}
-              <div className="mb-3">
-                <label className="text-xs text-ink-3 uppercase tracking-widest mb-2 block font-mono">Load (kg)</label>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => step(i, "weight", -2.5)}
-                    className="w-12 h-12 rounded-xl bg-paper text-ink-2 text-xl font-light active:bg-surface-dark flex items-center justify-center shrink-0 transition-colors"
-                  >
-                    −
-                  </button>
-                  <input
-                    type="number"
-                    inputMode="decimal"
-                    placeholder="—"
-                    value={ex.weight}
-                    onChange={(e) => update(i, "weight", e.target.value)}
-                    className="flex-1 bg-paper rounded-xl text-ink font-mono text-xl font-bold text-center h-12 focus:outline-none focus:ring-1 focus:ring-rule"
-                  />
-                  <button
-                    onClick={() => step(i, "weight", 2.5)}
-                    className="w-12 h-12 rounded-xl bg-paper text-ink-2 text-xl font-light active:bg-surface-dark flex items-center justify-center shrink-0 transition-colors"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* Reps + Sets */}
-              <div className="grid grid-cols-2 gap-3">
-                {(["reps", "sets"] as const).map((field) => (
-                  <div key={field}>
-                    <label className="text-xs text-ink-3 uppercase tracking-widest mb-2 block font-mono">{field}</label>
-                    <div className="flex items-center gap-1.5">
+          <div className="px-5 flex flex-col gap-3">
+            {data.map((ex, i) => {
+              const prev = previous[ex.name];
+              return (
+                <div key={ex.name} className="bg-surface rounded-2xl p-5">
+                  <div className="flex items-start justify-between mb-1">
+                    <div>
+                      <span className={`font-mono text-xs font-bold ${accent.text} mr-2`}>{i + 1}.</span>
+                      <span className="font-mono text-sm font-bold tracking-wide text-ink uppercase">{ex.name}</span>
+                    </div>
+                    {prev && (
                       <button
-                        onClick={() => step(i, field, -1)}
-                        className="w-10 h-10 rounded-xl bg-paper text-ink-2 text-lg font-light active:bg-surface-dark flex items-center justify-center shrink-0 transition-colors"
+                        onClick={() => usePrevious(i)}
+                        className={`font-mono text-xs font-bold tracking-wide ${accent.text} active:opacity-60 shrink-0 ml-3`}
                       >
-                        −
+                        ↩
                       </button>
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        placeholder="—"
-                        value={ex[field]}
-                        onChange={(e) => update(i, field, e.target.value)}
-                        className="flex-1 min-w-0 bg-paper rounded-xl text-ink font-mono text-base font-bold text-center h-10 focus:outline-none focus:ring-1 focus:ring-rule"
-                      />
-                      <button
-                        onClick={() => step(i, field, 1)}
-                        className="w-10 h-10 rounded-xl bg-paper text-ink-2 text-lg font-light active:bg-surface-dark flex items-center justify-center shrink-0 transition-colors"
-                      >
-                        +
-                      </button>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-ink-3 mb-4 ml-5">
+                    {prev
+                      ? `prev — ${prev.weight}kg · ${prev.reps} reps · ${prev.sets} sets`
+                      : "no previous entry"}
+                  </p>
+
+                  <div className="mb-3">
+                    <label className="text-xs text-ink-3 uppercase tracking-widest mb-2 block font-mono">Load (kg)</label>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => step(i, "weight", -2.5)} className="w-12 h-12 rounded-xl bg-paper text-ink-2 text-xl font-light active:bg-surface-dark flex items-center justify-center shrink-0 transition-colors">−</button>
+                      <input type="number" inputMode="decimal" placeholder="—" value={ex.weight} onChange={(e) => update(i, "weight", e.target.value)} className="flex-1 bg-paper rounded-xl text-ink font-mono text-xl font-bold text-center h-12 focus:outline-none focus:ring-1 focus:ring-rule" />
+                      <button onClick={() => step(i, "weight", 2.5)} className="w-12 h-12 rounded-xl bg-paper text-ink-2 text-xl font-light active:bg-surface-dark flex items-center justify-center shrink-0 transition-colors">+</button>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
 
-      {/* Log session */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {(["reps", "sets"] as const).map((field) => (
+                      <div key={field}>
+                        <label className="text-xs text-ink-3 uppercase tracking-widest mb-2 block font-mono">{field}</label>
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={() => step(i, field, -1)} className="w-10 h-10 rounded-xl bg-paper text-ink-2 text-lg font-light active:bg-surface-dark flex items-center justify-center shrink-0 transition-colors">−</button>
+                          <input type="number" inputMode="numeric" placeholder="—" value={ex[field]} onChange={(e) => update(i, field, e.target.value)} className="flex-1 min-w-0 bg-paper rounded-xl text-ink font-mono text-base font-bold text-center h-10 focus:outline-none focus:ring-1 focus:ring-rule" />
+                          <button onClick={() => step(i, field, 1)} className="w-10 h-10 rounded-xl bg-paper text-ink-2 text-lg font-light active:bg-surface-dark flex items-center justify-center shrink-0 transition-colors">+</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
       <div className="fixed bottom-0 left-0 right-0 px-5 pb-8 pt-4 bg-paper">
         <button
           onClick={handleSave}
-          disabled={saved}
+          disabled={saved || loading}
           className={`w-full rounded-2xl font-mono text-sm font-bold tracking-widest uppercase py-4 transition-colors ${
-            saved ? `${accent.bg} text-paper` : "bg-ink text-paper active:opacity-80"
+            saved ? `${accent.bg} text-paper` : "bg-ink text-paper active:opacity-80 disabled:opacity-50"
           }`}
         >
           {saved ? "✓  Session Logged" : "Log Session"}

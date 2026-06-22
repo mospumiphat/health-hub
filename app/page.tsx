@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { WORKOUT_META, TYPE_ACCENT_CLASS, WorkoutType } from "@/lib/types";
+import SignOutButton from "./components/SignOutButton";
 
 const workoutTypes: WorkoutType[] = ["push", "pull", "legs"];
 
@@ -19,9 +20,12 @@ export default function Home() {
 
       {/* Header */}
       <div className="px-5 pt-14 pb-8">
-        <p className="text-xs font-mono text-ink-3 uppercase tracking-widest mb-3">
-          {day} · {date}
-        </p>
+        <div className="flex items-start justify-between mb-3">
+          <p className="text-xs font-mono text-ink-3 uppercase tracking-widest">
+            {day} · {date}
+          </p>
+          <SignOutButton />
+        </div>
         <h1 className="font-display text-4xl font-bold text-ink leading-tight">Let's Train</h1>
         <p className="text-sm text-ink-3 mt-2">Choose today's workout</p>
       </div>
