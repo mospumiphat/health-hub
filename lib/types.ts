@@ -47,14 +47,22 @@ export const WORKOUT_TEMPLATES: Record<WorkoutType, string[]> = {
   ],
 };
 
-export const WORKOUT_META: Record<WorkoutType, { emoji: string; title: string; subtitle: string }> = {
-  push: { emoji: "🏋️", title: "Push Day", subtitle: "Chest • Shoulders • Triceps" },
-  pull: { emoji: "🔥", title: "Pull Day", subtitle: "Back • Biceps • Rear Delts" },
-  legs: { emoji: "🦵", title: "Leg Day", subtitle: "Legs • Glutes • Core" },
+export const WORKOUT_META: Record<WorkoutType, { numeral: string; title: string; subtitle: string }> = {
+  push: { numeral: "I",   title: "CHEST & SHOULDERS", subtitle: "Chest · Shoulders · Triceps" },
+  pull: { numeral: "II",  title: "BACK & ARMS",        subtitle: "Back · Biceps · Rear Delts"  },
+  legs: { numeral: "III", title: "LEGS & CORE",        subtitle: "Legs · Glutes · Core"        },
 };
 
 export const WORKOUT_LABELS: Record<WorkoutType, string> = {
-  push: "🏋️ Push Day",
-  pull: "🔥 Pull Day",
-  legs: "🦵 Leg Day",
+  push: "CHEST & SHOULDERS",
+  pull: "BACK & ARMS",
+  legs: "LEGS & CORE",
 };
+
+export const TYPE_ACCENT_CLASS: Record<WorkoutType, { text: string; border: string; bg: string }> = {
+  push: { text: "text-amber",   border: "border-amber",   bg: "bg-amber"   },
+  pull: { text: "text-forest",  border: "border-forest",  bg: "bg-forest"  },
+  legs: { text: "text-sienna",  border: "border-sienna",  bg: "bg-sienna"  },
+};
+
+export const ROMAN = ["I", "II", "III", "IV", "V"];

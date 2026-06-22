@@ -26,87 +26,65 @@ export default function ImportClient() {
       try {
         const raw = JSON.parse(ev.target?.result as string);
         const { sessions, errors } = parseImportData(raw);
-
         if (sessions.length === 0) {
-          setStatus({
-            kind: "error",
-            message: "No valid workout records found.",
-            rowErrors: errors.slice(0, 5),
-          });
+          setStatus({ kind: "error", message: "No valid records found.", rowErrors: errors.slice(0, 5) });
           return;
         }
-
         const { added, skipped } = mergeSessions(sessions);
         setStatus({ kind: "success", added, skipped });
       } catch {
-        setStatus({
-          kind: "error",
-          message: "Invalid JSON file. Make sure the file contains a valid JSON array.",
-          rowErrors: [],
-        });
+        setStatus({ kind: "error", message: "Invalid JSON file.", rowErrors: [] });
       }
     };
     reader.readAsText(file);
   }
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white flex flex-col pb-10">
+    <main className="min-h-screen bg-paper flex flex-col pb-10">
+
       {/* Header */}
-      <div className="px-4 pt-12 pb-5 flex items-center gap-3">
-        <Link href="/" className="text-zinc-400 text-sm active:text-white">
-          ← Back
+      <div className="px-6 pt-12 pb-5 border-b-2 border-ink">
+        <Link href="/" className="font-mono text-[10px] text-ink-3 uppercase tracking-[0.2em] active:text-ink block mb-3">
+          ← Back to Journal
         </Link>
-        <h1 className="text-2xl font-bold">Import History</h1>
+        <h1 className="font-display text-3xl font-bold text-ink">Import Data</h1>
+        <p className="font-mono text-[10px] text-ink-3 tracking-wider mt-1 uppercase">Load historical records from file</p>
       </div>
 
-      <div className="px-4 flex flex-col gap-5">
+      <div className="px-6 pt-6 flex flex-col gap-6">
 
-        {/* Upload area */}
+        {/* Upload zone */}
         <button
           onClick={() => fileRef.current?.click()}
-          className={`w-full border-2 border-dashed rounded-2xl py-12 flex flex-col items-center gap-3 transition-colors active:scale-[0.98] transition-transform ${
-            status.kind === "success"
-              ? "border-green-600 bg-green-900/10"
-              : status.kind === "error"
-              ? "border-red-700 bg-red-900/10"
-              : "border-zinc-700 active:border-zinc-500"
+          className={`w-full border-2 border-dashed py-12 flex flex-col items-center gap-3 transition-colors active:bg-surface ${
+            status.kind === "success" ? "border-forest" :
+            status.kind === "error"   ? "border-amber"  :
+                                        "border-rule"
           }`}
         >
-          <span className="text-4xl">
-            {status.kind === "success" ? "✅" : status.kind === "error" ? "❌" : "📂"}
+          <span className="font-display text-4xl italic text-ink-3">
+            {status.kind === "success" ? "✓" : status.kind === "error" ? "✕" : "↑"}
           </span>
-          <div className="text-center">
-            <p className="text-sm font-semibold text-zinc-300">
-              {fileName || "Tap to select JSON file"}
-            </p>
-            {fileName && status.kind === "idle" && (
-              <p className="text-xs text-zinc-600 mt-1">{fileName}</p>
-            )}
-          </div>
+          <p className="font-mono text-[10px] text-ink-2 uppercase tracking-[0.2em]">
+            {fileName || "Tap to select JSON file"}
+          </p>
+          {fileName && status.kind === "idle" && (
+            <p className="font-mono text-[9px] text-ink-3">{fileName}</p>
+          )}
         </button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept=".json,application/json"
-          className="hidden"
-          onChange={handleFile}
-        />
+        <input ref={fileRef} type="file" accept=".json,application/json" className="hidden" onChange={handleFile} />
 
         {/* Success */}
         {status.kind === "success" && (
-          <div className="bg-green-900/30 border border-green-700/50 rounded-2xl p-4">
-            <p className="text-green-400 font-bold text-base mb-1">Import successful</p>
-            <p className="text-zinc-300 text-sm">
-              {status.added} session{status.added !== 1 ? "s" : ""} added to history
-            </p>
+          <div className="border border-forest p-4">
+            <p className="font-mono text-[10px] font-bold text-forest uppercase tracking-[0.2em] mb-2">Import Complete</p>
+            <p className="font-mono text-xs text-ink-2">{status.added} session{status.added !== 1 ? "s" : ""} added</p>
             {status.skipped > 0 && (
-              <p className="text-zinc-500 text-xs mt-1">
-                {status.skipped} duplicate{status.skipped !== 1 ? "s" : ""} skipped
-              </p>
+              <p className="font-mono text-[10px] text-ink-3 mt-1">{status.skipped} duplicate{status.skipped !== 1 ? "s" : ""} skipped</p>
             )}
             <Link href="/history">
-              <button className="mt-3 w-full bg-green-700 active:bg-green-600 text-white text-sm font-semibold rounded-xl py-3 transition-transform active:scale-95">
-                View History →
+              <button className="mt-4 w-full bg-ink text-paper font-mono text-[10px] font-bold tracking-[0.25em] uppercase py-3 active:bg-ink-2 transition-colors">
+                View Record Book →
               </button>
             </Link>
           </div>
@@ -114,15 +92,13 @@ export default function ImportClient() {
 
         {/* Error */}
         {status.kind === "error" && (
-          <div className="bg-red-900/30 border border-red-700/50 rounded-2xl p-4">
-            <p className="text-red-400 font-bold text-base mb-1">Import failed</p>
-            <p className="text-zinc-300 text-sm">{status.message}</p>
+          <div className="border border-amber p-4">
+            <p className="font-mono text-[10px] font-bold text-amber uppercase tracking-[0.2em] mb-2">Import Failed</p>
+            <p className="font-mono text-xs text-ink-2">{status.message}</p>
             {status.rowErrors.length > 0 && (
-              <ul className="mt-3 flex flex-col gap-1.5 border-t border-red-900 pt-3">
+              <ul className="mt-3 flex flex-col gap-1.5 pt-3 border-t border-rule">
                 {status.rowErrors.map((err, i) => (
-                  <li key={i} className="text-xs text-zinc-500">
-                    {err}
-                  </li>
+                  <li key={i} className="font-mono text-[9px] text-ink-3">{err}</li>
                 ))}
               </ul>
             )}
@@ -130,11 +106,9 @@ export default function ImportClient() {
         )}
 
         {/* Format reference */}
-        <div className="bg-zinc-900 rounded-2xl p-4">
-          <p className="text-xs text-zinc-400 font-semibold uppercase tracking-widest mb-3">
-            Expected format
-          </p>
-          <pre className="text-xs text-zinc-500 leading-relaxed overflow-x-auto bg-zinc-950 rounded-xl p-3">{`[
+        <div className="border border-rule p-4">
+          <p className="font-mono text-[9px] text-ink-3 uppercase tracking-[0.25em] mb-3">Expected Format</p>
+          <pre className="font-mono text-[10px] text-ink-2 leading-relaxed overflow-x-auto bg-surface p-3">{`[
   {
     "date": "2026-01-15",
     "exercise": "Bench Press",
@@ -144,13 +118,9 @@ export default function ImportClient() {
     "workoutType": "push"
   }
 ]`}</pre>
-          <div className="mt-3 flex gap-2">
-            {["push", "pull", "legs"].map((t) => (
-              <span key={t} className="text-xs bg-zinc-800 text-zinc-400 px-2 py-1 rounded-lg font-mono">
-                {t}
-              </span>
-            ))}
-          </div>
+          <p className="font-mono text-[9px] text-ink-3 mt-3">
+            workoutType: <span className="text-amber">push</span> · <span className="text-forest">pull</span> · <span className="text-sienna">legs</span>
+          </p>
         </div>
 
       </div>

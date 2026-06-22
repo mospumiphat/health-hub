@@ -3,19 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSessions } from "@/lib/storage";
-import { WorkoutSession, WORKOUT_META, WorkoutType } from "@/lib/types";
-
-const typeBadge: Record<WorkoutType, string> = {
-  push: "bg-orange-500/20 text-orange-400 border-orange-500/30",
-  pull: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  legs: "bg-green-500/20 text-green-400 border-green-500/30",
-};
-
-const typeBar: Record<WorkoutType, string> = {
-  push: "bg-orange-500",
-  pull: "bg-blue-500",
-  legs: "bg-green-500",
-};
+import { WorkoutSession, WORKOUT_META, TYPE_ACCENT_CLASS, WorkoutType } from "@/lib/types";
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -43,50 +31,43 @@ function formatTime(iso: string): string {
 function SessionCard({ session }: { session: WorkoutSession }) {
   const [expanded, setExpanded] = useState(false);
   const meta = WORKOUT_META[session.type];
+  const accent = TYPE_ACCENT_CLASS[session.type];
 
   return (
-    <div className="bg-zinc-900 rounded-2xl overflow-hidden relative">
-      {/* Left color bar */}
-      <div className={`absolute left-0 top-0 bottom-0 w-1 ${typeBar[session.type]}`} />
-
+    <div className="border-b border-rule">
       <button
         onClick={() => setExpanded((v) => !v)}
-        className="w-full pl-5 pr-4 py-4 flex items-center justify-between active:bg-zinc-800/50 transition-colors"
+        className="w-full py-4 flex items-start justify-between active:bg-surface transition-colors text-left"
       >
-        <div className="flex items-center gap-3">
-          <span className="text-xl">{meta.emoji}</span>
-          <div className="text-left">
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="font-semibold text-sm">{meta.title}</p>
-              <span className={`text-xs border px-2 py-0.5 rounded-full font-medium ${typeBadge[session.type]}`}>
-                {session.exercises.length} exercises
-              </span>
-            </div>
-            <p className="text-xs text-zinc-500 mt-0.5">
+        <div className="flex items-baseline gap-3">
+          <span className={`font-mono text-xs font-bold shrink-0 ${accent.text}`}>{meta.numeral}</span>
+          <div>
+            <p className="font-mono text-[10px] font-bold tracking-[0.15em] text-ink uppercase">{meta.title}</p>
+            <p className="font-mono text-[10px] text-ink-3 mt-0.5">
               {formatDate(session.date)}
-              {formatDate(session.date) !== "Today" && formatDate(session.date) !== "Yesterday" && (
-                <span> · {formatTime(session.date)}</span>
-              )}
+              {formatDate(session.date) !== "Today" && formatDate(session.date) !== "Yesterday"
+                ? ` · ${formatTime(session.date)}`
+                : ""}
+              {" · "}{session.exercises.length} entries
             </p>
           </div>
         </div>
-        <span className={`text-zinc-500 text-xs transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}>
-          ▼
+        <span className="font-mono text-[10px] text-ink-3 mt-0.5 ml-3 shrink-0">
+          {expanded ? "▲" : "▼"}
         </span>
       </button>
 
       {expanded && (
-        <div className="border-t border-zinc-800 pl-5 pr-4 py-3 flex flex-col gap-2.5">
+        <div className="pb-4 pl-6 flex flex-col gap-2">
           {session.exercises.map((ex) => {
             const hasData = ex.weight || ex.reps || ex.sets;
             return (
-              <div key={ex.name} className="flex items-center justify-between">
-                <span className="text-sm text-zinc-300">{ex.name}</span>
-                <span className="text-xs text-zinc-500 font-mono">
+              <div key={ex.name} className="flex items-baseline justify-between">
+                <span className="font-mono text-[10px] text-ink-2 uppercase tracking-wider">{ex.name}</span>
+                <span className="font-mono text-[10px] text-ink-3 ml-4 shrink-0">
                   {hasData
                     ? [ex.weight && `${ex.weight}kg`, ex.sets && ex.reps && `${ex.sets}×${ex.reps}`]
-                        .filter(Boolean)
-                        .join("  ") || "—"
+                        .filter(Boolean).join("  ") || "—"
                     : "—"}
                 </span>
               </div>
@@ -101,10 +82,7 @@ function SessionCard({ session }: { session: WorkoutSession }) {
 function groupByMonth(sessions: WorkoutSession[]): { label: string; items: WorkoutSession[] }[] {
   const groups: Record<string, WorkoutSession[]> = {};
   for (const s of sessions) {
-    const key = new Date(s.date).toLocaleDateString("en-GB", {
-      month: "long",
-      year: "numeric",
-    });
+    const key = new Date(s.date).toLocaleDateString("en-GB", { month: "long", year: "numeric" });
     if (!groups[key]) groups[key] = [];
     groups[key].push(s);
   }
@@ -121,34 +99,36 @@ export default function HistoryClient() {
   const groups = groupByMonth(sessions);
 
   return (
-    <main className="min-h-screen bg-zinc-950 text-white flex flex-col pb-10">
+    <main className="min-h-screen bg-paper flex flex-col pb-10">
+
       {/* Header */}
-      <div className="px-4 pt-12 pb-5 flex items-center gap-3">
-        <Link href="/" className="text-zinc-400 text-sm active:text-white">
-          ← Back
-        </Link>
-        <h1 className="text-2xl font-bold">History</h1>
+      <div className="px-6 pt-12 pb-5 border-b-2 border-ink flex items-baseline justify-between">
+        <div>
+          <Link href="/" className="font-mono text-[10px] text-ink-3 uppercase tracking-[0.2em] active:text-ink block mb-3">
+            ← Back to Journal
+          </Link>
+          <h1 className="font-display text-3xl font-bold text-ink">Record Book</h1>
+        </div>
         {sessions.length > 0 && (
-          <span className="ml-auto text-xs text-zinc-500 bg-zinc-800 px-2.5 py-1 rounded-full">
+          <span className="font-mono text-[10px] text-ink-3 uppercase tracking-wider shrink-0 ml-4">
             {sessions.length} sessions
           </span>
         )}
       </div>
 
       {sessions.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-zinc-500 gap-3 mt-24 px-8 text-center">
-          <span className="text-5xl">💪</span>
-          <p className="text-base font-medium text-zinc-400">No workouts logged yet</p>
-          <p className="text-sm text-zinc-600">Complete your first session to see it here.</p>
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 mt-24 px-8 text-center">
+          <p className="font-display text-2xl italic text-ink-3">No entries yet.</p>
+          <p className="font-mono text-[10px] text-ink-3 uppercase tracking-[0.2em]">Log your first session to begin.</p>
         </div>
       ) : (
-        <div className="px-4 flex flex-col gap-6">
+        <div className="px-6 flex flex-col gap-8 pt-6">
           {groups.map(({ label, items }) => (
             <div key={label}>
-              <p className="text-xs text-zinc-500 uppercase tracking-widest mb-3 font-semibold">
+              <p className="font-mono text-[9px] text-ink-3 uppercase tracking-[0.3em] mb-2 pb-2 border-b border-rule">
                 {label}
               </p>
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col">
                 {items.map((session) => (
                   <SessionCard key={session.id} session={session} />
                 ))}
