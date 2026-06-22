@@ -53,6 +53,20 @@ export default function ImportClient() {
 
       <div className="px-5 flex flex-col gap-4">
 
+        {/* Download seed data */}
+        <a
+          href="/workout-history.json"
+          download="workout-history.json"
+          className="w-full bg-surface rounded-2xl border-l-[3px] border-sienna px-5 py-4 flex items-center gap-3 active:bg-surface-dark transition-colors"
+        >
+          <span className="text-xl shrink-0">💾</span>
+          <div className="flex-1 min-w-0">
+            <p className="font-mono text-xs font-bold text-sienna uppercase tracking-widest">Download History File</p>
+            <p className="text-xs text-ink-3 mt-0.5">workout-history.json — Jan–Jun 2026</p>
+          </div>
+          <span className="text-ink-3 text-xl shrink-0">↓</span>
+        </a>
+
         {/* Upload zone */}
         <button
           onClick={() => fileRef.current?.click()}
