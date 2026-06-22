@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Workout Tracker
 
-## Getting Started
+A personal gym workout tracker built for mobile. Log Push, Pull, and Leg day sessions with autofill from previous workouts — no login, no cloud, just fast logging.
 
-First, run the development server:
+## Features
+
+- **3 workout programs** — Push Day, Pull Day, Leg Day with preset exercises
+- **Stepper inputs** — +/− buttons for weight (2.5kg steps), reps, and sets — gym-friendly, no typing needed
+- **Autofill** — tap "Use Last" per exercise or "Fill Entire Workout" to load all previous values in one tap
+- **History** — expandable session log grouped by month, color-coded by workout type
+- **Import** — load historical data from a JSON file, merges with existing history and skips duplicates
+- **localStorage only** — all data stays in the browser, no account or backend required
+
+## Tech Stack
+
+- [Next.js 15](https://nextjs.org/) — App Router
+- TypeScript
+- Tailwind CSS v4
+- localStorage for client-side persistence
+
+## Local Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Import Format
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To load historical workout data, go to **Import** and upload a JSON file in this shape:
 
-## Learn More
+```json
+[
+  {
+    "date": "2026-01-15",
+    "exercise": "Bench Press",
+    "weight": 60,
+    "reps": 8,
+    "sets": 4,
+    "workoutType": "push"
+  }
+]
+```
 
-To learn more about Next.js, take a look at the following resources:
+`workoutType` must be `"push"`, `"pull"`, or `"legs"`. Records on the same date and type are grouped into one session automatically. Duplicates are skipped on re-import.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Roadmap
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [ ] Progressive overload suggestions
+- [ ] Rest timer between sets
+- [ ] Bodyweight exercise support (no weight field)
+- [ ] Export data to JSON
+- [ ] PWA — install to home screen
