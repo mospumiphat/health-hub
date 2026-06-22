@@ -47,10 +47,10 @@ export const WORKOUT_TEMPLATES: Record<WorkoutType, string[]> = {
   ],
 };
 
-export const WORKOUT_META: Record<WorkoutType, { numeral: string; title: string; subtitle: string }> = {
-  push: { numeral: "I",   title: "CHEST & SHOULDERS", subtitle: "Chest · Shoulders · Triceps" },
-  pull: { numeral: "II",  title: "BACK & ARMS",        subtitle: "Back · Biceps · Rear Delts"  },
-  legs: { numeral: "III", title: "LEGS & CORE",        subtitle: "Legs · Glutes · Core"        },
+export const WORKOUT_META: Record<WorkoutType, { numeral: string; title: string; subtitle: string; icon: string }> = {
+  push: { numeral: "I",   title: "CHEST & SHOULDERS", subtitle: "Chest · Shoulders · Triceps", icon: "🏋️" },
+  pull: { numeral: "II",  title: "BACK & ARMS",        subtitle: "Back · Biceps · Rear Delts",  icon: "🔥"  },
+  legs: { numeral: "III", title: "LEGS & CORE",        subtitle: "Legs · Glutes · Core",        icon: "🦵"  },
 };
 
 export const WORKOUT_LABELS: Record<WorkoutType, string> = {

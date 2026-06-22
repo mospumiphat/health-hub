@@ -43,27 +43,27 @@ export default function ImportClient() {
     <main className="min-h-screen bg-paper flex flex-col pb-10">
 
       {/* Header */}
-      <div className="px-6 pt-12 pb-5 border-b-2 border-ink">
-        <Link href="/" className="font-mono text-xs text-ink-3 uppercase tracking-widest active:text-ink block mb-3">
-          ← Back to Journal
+      <div className="px-5 pt-12 pb-6">
+        <Link href="/" className="text-xs font-mono text-ink-3 uppercase tracking-widest active:text-ink block mb-4">
+          ← Back
         </Link>
         <h1 className="font-display text-3xl font-bold text-ink">Import Data</h1>
-        <p className="font-mono text-xs text-ink-3 tracking-wider mt-1 uppercase">Load historical records from file</p>
+        <p className="text-sm text-ink-3 mt-1">Load historical records from file</p>
       </div>
 
-      <div className="px-6 pt-6 flex flex-col gap-6">
+      <div className="px-5 flex flex-col gap-4">
 
         {/* Upload zone */}
         <button
           onClick={() => fileRef.current?.click()}
-          className={`w-full border-2 border-dashed py-12 flex flex-col items-center gap-3 transition-colors active:bg-surface ${
+          className={`w-full bg-surface rounded-2xl py-12 flex flex-col items-center gap-3 active:bg-surface-dark transition-colors border-2 border-dashed ${
             status.kind === "success" ? "border-forest" :
             status.kind === "error"   ? "border-amber"  :
                                         "border-rule"
           }`}
         >
-          <span className="font-display text-4xl italic text-ink-3">
-            {status.kind === "success" ? "✓" : status.kind === "error" ? "✕" : "↑"}
+          <span className="text-3xl">
+            {status.kind === "success" ? "✅" : status.kind === "error" ? "❌" : "📂"}
           </span>
           <p className="font-mono text-xs text-ink-2 uppercase tracking-widest">
             {fileName || "Tap to select JSON file"}
@@ -73,14 +73,14 @@ export default function ImportClient() {
 
         {/* Success */}
         {status.kind === "success" && (
-          <div className="border border-forest p-4">
+          <div className="bg-surface rounded-2xl border-l-[3px] border-forest p-5">
             <p className="font-mono text-xs font-bold text-forest uppercase tracking-widest mb-2">Import Complete</p>
-            <p className="font-mono text-sm text-ink-2">{status.added} session{status.added !== 1 ? "s" : ""} added</p>
+            <p className="text-sm text-ink">{status.added} session{status.added !== 1 ? "s" : ""} added</p>
             {status.skipped > 0 && (
-              <p className="font-mono text-xs text-ink-3 mt-1">{status.skipped} duplicate{status.skipped !== 1 ? "s" : ""} skipped</p>
+              <p className="text-xs text-ink-3 font-mono mt-1">{status.skipped} duplicate{status.skipped !== 1 ? "s" : ""} skipped</p>
             )}
             <Link href="/history">
-              <button className="mt-4 w-full bg-ink text-paper font-mono text-xs font-bold tracking-widest uppercase py-3 active:bg-ink-2 transition-colors">
+              <button className="mt-4 w-full bg-ink rounded-2xl text-paper font-mono text-xs font-bold tracking-widest uppercase py-3.5 active:opacity-80 transition-opacity">
                 View Record Book →
               </button>
             </Link>
@@ -89,9 +89,9 @@ export default function ImportClient() {
 
         {/* Error */}
         {status.kind === "error" && (
-          <div className="border border-amber p-4">
+          <div className="bg-surface rounded-2xl border-l-[3px] border-amber p-5">
             <p className="font-mono text-xs font-bold text-amber uppercase tracking-widest mb-2">Import Failed</p>
-            <p className="font-mono text-sm text-ink-2">{status.message}</p>
+            <p className="text-sm text-ink">{status.message}</p>
             {status.rowErrors.length > 0 && (
               <ul className="mt-3 flex flex-col gap-1.5 pt-3 border-t border-rule">
                 {status.rowErrors.map((err, i) => (
@@ -103,9 +103,9 @@ export default function ImportClient() {
         )}
 
         {/* Format reference */}
-        <div className="border border-rule p-4">
+        <div className="bg-surface rounded-2xl p-5">
           <p className="font-mono text-xs text-ink-3 uppercase tracking-widest mb-3">Expected Format</p>
-          <pre className="font-mono text-xs text-ink-2 leading-relaxed overflow-x-auto bg-surface p-3">{`[
+          <pre className="font-mono text-xs text-ink-2 leading-relaxed overflow-x-auto bg-paper rounded-xl p-3">{`[
   {
     "date": "2026-01-15",
     "exercise": "Bench Press",

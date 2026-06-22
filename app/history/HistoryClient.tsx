@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSessions } from "@/lib/storage";
-import { WorkoutSession, WORKOUT_META, TYPE_ACCENT_CLASS, WorkoutType } from "@/lib/types";
+import { WorkoutSession, WORKOUT_META, TYPE_ACCENT_CLASS } from "@/lib/types";
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -14,57 +14,47 @@ function formatDate(iso: string): string {
   if (d.toDateString() === today.toDateString()) return "Today";
   if (d.toDateString() === yesterday.toDateString()) return "Yesterday";
 
-  return d.toLocaleDateString("en-GB", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
+  return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
 }
 
 function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return new Date(iso).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
 function SessionCard({ session }: { session: WorkoutSession }) {
   const [expanded, setExpanded] = useState(false);
   const meta = WORKOUT_META[session.type];
   const accent = TYPE_ACCENT_CLASS[session.type];
+  const dateLabel = formatDate(session.date);
 
   return (
-    <div className="border-b border-rule">
+    <div className={`bg-surface rounded-2xl border-l-[3px] ${accent.border} overflow-hidden`}>
       <button
         onClick={() => setExpanded((v) => !v)}
-        className="w-full py-4 flex items-start justify-between active:bg-surface transition-colors text-left"
+        className="w-full px-5 py-4 flex items-center justify-between active:bg-surface-dark transition-colors text-left"
       >
-        <div className="flex items-baseline gap-3">
-          <span className={`font-mono text-sm font-bold shrink-0 ${accent.text}`}>{meta.numeral}</span>
+        <div className="flex items-center gap-3">
+          <span className="text-xl shrink-0">{meta.icon}</span>
           <div>
-            <p className="font-mono text-sm font-bold tracking-wider text-ink uppercase">{meta.title}</p>
-            <p className="font-mono text-xs text-ink-3 mt-0.5">
-              {formatDate(session.date)}
-              {formatDate(session.date) !== "Today" && formatDate(session.date) !== "Yesterday"
-                ? ` · ${formatTime(session.date)}`
-                : ""}
+            <p className={`font-mono text-sm font-bold tracking-wide ${accent.text}`}>{meta.title}</p>
+            <p className="text-xs text-ink-3 mt-0.5">
+              {dateLabel}
+              {dateLabel !== "Today" && dateLabel !== "Yesterday" ? ` · ${formatTime(session.date)}` : ""}
               {" · "}{session.exercises.length} entries
             </p>
           </div>
         </div>
-        <span className="font-mono text-xs text-ink-3 mt-0.5 ml-3 shrink-0">
-          {expanded ? "▲" : "▼"}
-        </span>
+        <span className="text-ink-3 text-xs ml-3 shrink-0">{expanded ? "▲" : "▼"}</span>
       </button>
 
       {expanded && (
-        <div className="pb-4 pl-6 flex flex-col gap-2.5">
+        <div className="px-5 pb-4 pt-1 border-t border-rule flex flex-col gap-2">
           {session.exercises.map((ex) => {
             const hasData = ex.weight || ex.reps || ex.sets;
             return (
               <div key={ex.name} className="flex items-baseline justify-between">
-                <span className="font-mono text-xs text-ink-2 uppercase tracking-wider">{ex.name}</span>
-                <span className="font-mono text-xs text-ink-3 ml-4 shrink-0">
+                <span className="text-xs text-ink-2 font-mono uppercase tracking-wider">{ex.name}</span>
+                <span className="text-xs text-ink-3 font-mono ml-4 shrink-0">
                   {hasData
                     ? [ex.weight && `${ex.weight}kg`, ex.sets && ex.reps && `${ex.sets}×${ex.reps}`]
                         .filter(Boolean).join("  ") || "—"
@@ -102,33 +92,31 @@ export default function HistoryClient() {
     <main className="min-h-screen bg-paper flex flex-col pb-10">
 
       {/* Header */}
-      <div className="px-6 pt-12 pb-5 border-b-2 border-ink flex items-baseline justify-between">
+      <div className="px-5 pt-12 pb-6 flex items-center justify-between">
         <div>
-          <Link href="/" className="font-mono text-xs text-ink-3 uppercase tracking-widest active:text-ink block mb-3">
-            ← Back to Journal
+          <Link href="/" className="text-xs font-mono text-ink-3 uppercase tracking-widest active:text-ink block mb-4">
+            ← Back
           </Link>
           <h1 className="font-display text-3xl font-bold text-ink">Record Book</h1>
         </div>
         {sessions.length > 0 && (
-          <span className="font-mono text-xs text-ink-3 uppercase tracking-wider shrink-0 ml-4">
+          <span className="font-mono text-xs text-ink-3 uppercase tracking-wider shrink-0 ml-4 self-end pb-0.5">
             {sessions.length} sessions
           </span>
         )}
       </div>
 
       {sessions.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center gap-3 mt-24 px-8 text-center">
+        <div className="flex-1 flex flex-col items-center justify-center gap-3 px-8 text-center">
           <p className="font-display text-2xl italic text-ink-3">No entries yet.</p>
-          <p className="font-mono text-xs text-ink-3 uppercase tracking-widest">Log your first session to begin.</p>
+          <p className="text-xs font-mono text-ink-3 uppercase tracking-widest">Log your first session to begin.</p>
         </div>
       ) : (
-        <div className="px-6 flex flex-col gap-8 pt-6">
+        <div className="px-5 flex flex-col gap-6">
           {groups.map(({ label, items }) => (
             <div key={label}>
-              <p className="font-mono text-xs text-ink-3 uppercase tracking-widest mb-2 pb-2 border-b border-rule">
-                — {label}
-              </p>
-              <div className="flex flex-col">
+              <p className="font-mono text-xs text-ink-3 uppercase tracking-widest mb-3">— {label}</p>
+              <div className="flex flex-col gap-2">
                 {items.map((session) => (
                   <SessionCard key={session.id} session={session} />
                 ))}
